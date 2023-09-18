@@ -27,6 +27,33 @@ services:
       MONGO_USERNAME: admin
       MONGO_PASSWORD: password
 
+  queue-listener:
+    build:
+      context: ./queue-listener
+      dockerfile: ./Dockerfile
+    restart: always
+    deploy:
+      mode: replicated
+      replicas: 1
+    environment:
+      DSN: "host=postgres port=5432 user=postgres password=password dbname=jobs sslmode=disable timezone=Europe/Amsterdam connect_timeout=5"
+
+  postgres:
+    image: 'postgres:latest'
+    restart: always
+    ports:
+      - "5432:5432"
+    deploy:
+      mode: replicated
+      replicas: 1
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: jobs
+    volumes:
+      - ./db-data/postgres/:/var/lib/postgresql/data/
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
 #  mail-service:
 #    build:
 #      context: ./mail-service
