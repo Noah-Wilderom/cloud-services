@@ -3,6 +3,8 @@ package data
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
+	"errors"
 	"log"
 	"time"
 )
@@ -30,11 +32,16 @@ type Models struct {
 
 // Job is the structure which holds one job from the database.
 type Job struct {
-	ID         string     `json:"id"`
-	Payload    string     `json:"payload"`
-	ReservedAt *time.Time `json:"reserved_at"`
+	Id         string     `json:"id"`
+	Payload    JobPayload `json:"payload"`
+	ReservedAt *time.Time `json:"reserved_at,omitempty"`
 	CreatedAt  time.Time  `json:"created_at"`
 	UpdatedAt  time.Time  `json:"updated_at"`
+}
+
+type JobPayload struct {
+	Service string          `json:"service"`
+	Data    json.RawMessage `json:"data"`
 }
 
 // GetAll returns a slice of all jobs, sorted by last name
@@ -43,7 +50,7 @@ func (u *Job) GetAll() ([]*Job, error) {
 	defer cancel()
 
 	query := `select id, payload, reserved_at, created_at, updated_at
-	from jobs order by created_at desc`
+        from jobs order by created_at desc`
 
 	rows, err := db.QueryContext(ctx, query)
 	if err != nil {
@@ -55,15 +62,24 @@ func (u *Job) GetAll() ([]*Job, error) {
 
 	for rows.Next() {
 		var job Job
+		var payloadData []byte // Temporary variable to hold payload data
+
 		err := rows.Scan(
-			&job.ID,
-			&job.Payload,
+			&job.Id,
+			&payloadData, // Scan the payload data into a []byte variable
 			&job.ReservedAt,
 			&job.CreatedAt,
 			&job.UpdatedAt,
 		)
 		if err != nil {
 			log.Println("Error scanning", err)
+			return nil, err
+		}
+
+		// Unmarshal the payload data into the JobPayload field
+		err = json.Unmarshal(payloadData, &job.Payload)
+		if err != nil {
+			log.Println("Error unmarshaling payload data", err)
 			return nil, err
 		}
 
@@ -73,12 +89,34 @@ func (u *Job) GetAll() ([]*Job, error) {
 	return jobs, nil
 }
 
+func (jp *JobPayload) Scan(value interface{}) error {
+	// Check if the value is nil
+	if value == nil {
+		*jp = JobPayload{} // Set the JobPayload to an empty value
+		return nil
+	}
+
+	// Check if the value is of []uint8 type (common type for database blobs)
+	bytes, ok := value.([]byte)
+	if !ok {
+		return errors.New("Invalid data type for JobPayload")
+	}
+
+	// Unmarshal the JSON-encoded bytes into the JobPayload struct
+	err := json.Unmarshal(bytes, jp)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (u *Job) GetUnhandledJobs() ([]*Job, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
 	defer cancel()
 
 	query := `select id, payload, reserved_at, created_at, updated_at
-	from jobs where reserved_at is null order by created_at desc`
+        from jobs where reserved_at is null order by created_at desc`
 
 	rows, err := db.QueryContext(ctx, query)
 	if err != nil {
@@ -90,9 +128,11 @@ func (u *Job) GetUnhandledJobs() ([]*Job, error) {
 
 	for rows.Next() {
 		var job Job
+		var payloadData []byte // Temporary variable to hold payload data
+
 		err := rows.Scan(
-			&job.ID,
-			&job.Payload,
+			&job.Id,
+			&payloadData, // Scan the payload data into a []byte variable
 			&job.ReservedAt,
 			&job.CreatedAt,
 			&job.UpdatedAt,
@@ -101,6 +141,17 @@ func (u *Job) GetUnhandledJobs() ([]*Job, error) {
 			log.Println("Error scanning", err)
 			return nil, err
 		}
+
+		// Parse the JSON-encoded payload data into the JobPayload struct
+		var payload JobPayload
+		err = json.Unmarshal(payloadData, &payload)
+		if err != nil {
+			log.Println("Error unmarshaling payload data", err)
+			return nil, err
+		}
+
+		// Assign the parsed payload to the job
+		job.Payload = payload
 
 		jobs = append(jobs, &job)
 	}
@@ -115,21 +166,61 @@ func (u *Job) Refresh() error {
 
 	query := `select id, payload, reserved_at, created_at, updated_at from jobs where id = $1`
 
-	row := db.QueryRowContext(ctx, query, u.ID)
+	row := db.QueryRowContext(ctx, query, u.Id)
+
+	var payloadData []byte // Temporary variable to hold payload data
 
 	err := row.Scan(
-		u.ID,
-		u.Payload,
-		u.ReservedAt,
-		u.CreatedAt,
-		u.UpdatedAt,
+		&u.Id,
+		&payloadData, // Scan the payload data into a []byte variable
+		&u.ReservedAt,
+		&u.CreatedAt,
+		&u.UpdatedAt,
 	)
 
 	if err != nil {
 		return err
 	}
 
+	// Unmarshal the payload data into the JobPayload field
+	err = json.Unmarshal(payloadData, &u.Payload)
+	if err != nil {
+		return err
+	}
+
 	return nil
+}
+
+func RefreshById(id string) (*Job, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
+	defer cancel()
+
+	query := `select id, payload, reserved_at, created_at, updated_at from jobs where id = $1`
+
+	row := db.QueryRowContext(ctx, query, id)
+
+	var j Job
+	var payloadData []byte // Temporary variable to hold payload data
+
+	err := row.Scan(
+		&j.Id,
+		&payloadData, // Scan the payload data into a []byte variable
+		&j.ReservedAt,
+		&j.CreatedAt,
+		&j.UpdatedAt,
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	// Unmarshal the payload data into the JobPayload field
+	err = json.Unmarshal(payloadData, &j.Payload)
+	if err != nil {
+		return nil, err
+	}
+
+	return &j, nil
 }
 
 // Update updates one job in the database, using the information
@@ -139,13 +230,13 @@ func (j *Job) SetReserved() error {
 	defer cancel()
 
 	stmt := `update jobs set
-		reserved_at= $1,
+		reserved_at = $1,
 		where id = $2
 	`
 
 	_, err := db.ExecContext(ctx, stmt,
 		time.Now(),
-		j.ID,
+		j.Id,
 	)
 
 	if err != nil {
@@ -157,6 +248,27 @@ func (j *Job) SetReserved() error {
 	return nil
 }
 
+func SetReservedById(id string) (*Job, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
+	defer cancel()
+
+	stmt := `update jobs set
+		reserved_at = $1
+		where id = $2
+	`
+
+	_, err := db.ExecContext(ctx, stmt,
+		time.Now(),
+		id,
+	)
+
+	if err != nil {
+		return &Job{}, err
+	}
+
+	return RefreshById(id)
+}
+
 // Delete deletes one job from the database, by Job.ID
 func (j *Job) Delete() error {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
@@ -164,7 +276,7 @@ func (j *Job) Delete() error {
 
 	stmt := `delete from jobs where id = $1`
 
-	_, err := db.ExecContext(ctx, stmt, j.ID)
+	_, err := db.ExecContext(ctx, stmt, j.Id)
 	if err != nil {
 		return err
 	}
@@ -179,22 +291,28 @@ func (j *Job) Insert(job Job) (*Job, error) {
 
 	var newID string
 	stmt := `insert into jobs (payload, reserved_at, created_at, updated_at)
-		values ($1, $2, $3, $4) returning id`
+        values ($1, $2, $3, $4) returning id`
 
-	err := db.QueryRowContext(ctx, stmt,
-		job.Payload,
+	// Marshal the JobPayload field into JSON before insertion
+	payloadData, err := json.Marshal(job.Payload)
+	if err != nil {
+		return nil, err
+	}
+
+	err = db.QueryRowContext(ctx, stmt,
+		payloadData, // Insert the JSON-encoded payload data
 		time.Now(),
 		time.Now(),
 		time.Now(),
 	).Scan(&newID)
 
 	if err != nil {
-		return &job, err
+		return nil, err
 	}
 
-	job.ID = newID
+	job.Id = newID
 
-	_ = job.Refresh()
+	// No need to call Refresh() here, as the newly inserted data should already be in the struct
 
 	return &job, nil
 }

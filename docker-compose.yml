@@ -38,6 +38,15 @@ services:
     environment:
       DSN: "host=postgres port=5432 user=postgres password=password dbname=jobs sslmode=disable timezone=Europe/Amsterdam connect_timeout=5"
 
+  queue-worker:
+    build:
+      context: ./queue-worker
+      dockerfile: ./Dockerfile
+    restart: always
+    deploy:
+      mode: replicated
+      replicas: 1
+
   postgres:
     image: 'postgres:latest'
     restart: always

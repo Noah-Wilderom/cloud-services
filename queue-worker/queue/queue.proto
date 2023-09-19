@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package queue;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "/queue";
+
+message JobPayload {
+  string Service = 1;
+  bytes Data = 2;
+}
+
+message Job {
+  string Id = 1;
+  JobPayload Payload = 2;
+  google.protobuf.Timestamp ReservedAt = 3;
+  google.protobuf.Timestamp CreatedAt = 4;
+  google.protobuf.Timestamp UpdatedAt = 5;
+}
+
+message JobRequest {
+  Job job = 1;
+}
+
+message JobResponse {
+  bool Error = 1;
+  string ErrorPayload = 2;
+}
+
+service QueueWorkerService {
+  rpc HandleJob(JobRequest) returns (JobResponse);
+}
+
+service QueueListenerService {
+  rpc RefreshJob(Job) returns (Job);
+  rpc SetJobReserved(Job) returns (Job);
+}
