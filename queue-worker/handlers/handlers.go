@@ -23,19 +23,19 @@ type ProjectPayload struct {
 }
 
 type Project struct {
-	Id           string  `json:"id"`
-	Domain       Domain  `json:"domain"`
-	Status       string  `json:"status"`
-	Name         string  `json:"name"`
-	Subdomain    string  `json:"subdomain"`
-	Docker       bool    `json:"docker"`
-	SFTP         *SFTP   `json:"sftp"`
-	PreviewImage *string `json:"preview_image"`
-	User         *string `json:"user"`
-	SshKeyPath   *string `json:"ssh_key_path"`
-	FilesPath    *string `json:"files_path"`
-	Git          *Git    `json:"git"`
-	Monitoring   bool    `json:"monitoring"`
+	Id           string `json:"id"`
+	Domain       Domain `json:"domain"`
+	Status       string `json:"status"`
+	Name         string `json:"name"`
+	Subdomain    string `json:"subdomain"`
+	Docker       bool   `json:"docker"`
+	SFTP         *SFTP  `json:"sftp"`
+	PreviewImage string `json:"preview_image"`
+	User         string `json:"user"`
+	SshKeyPath   string `json:"ssh_key_path"`
+	FilesPath    string `json:"files_path"`
+	Git          *Git   `json:"git"`
+	Monitoring   bool   `json:"monitoring"`
 }
 
 type SFTP struct {
@@ -115,10 +115,10 @@ func SendProjectJob(data []byte) error {
 					Password: requestPayload.Project.SFTP.Password,
 					Path:     requestPayload.Project.SFTP.Path,
 				},
-				PreviewImage: *requestPayload.Project.PreviewImage,
-				User:         *requestPayload.Project.User,
-				SshKeyPath:   *requestPayload.Project.SshKeyPath,
-				FilesPath:    *requestPayload.Project.FilesPath,
+				PreviewImage: requestPayload.Project.PreviewImage,
+				User:         requestPayload.Project.User,
+				SshKeyPath:   requestPayload.Project.SshKeyPath,
+				FilesPath:    requestPayload.Project.FilesPath,
 				Git: &projects.Git{
 					Repository: requestPayload.Project.Git.Repository,
 					WebhookUrl: requestPayload.Project.Git.WebhookUrl,
