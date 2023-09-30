@@ -99,7 +99,7 @@ func SendProjectJob(data []byte) error {
 	err = sendPayloadThroughGRPC("project-service:5004", func(conn *grpc.ClientConn, ctx context.Context) {
 		c := projects.NewProjectServiceClient(conn)
 
-		resp, _ := c.HandleJob(ctx, &projects.ProjectRequest{
+		resp, err := c.HandleJob(ctx, &projects.ProjectRequest{
 			Project: &projects.Project{
 				Id: requestPayload.Project.Id,
 				Domain: &projects.Domain{
@@ -129,8 +129,11 @@ func SendProjectJob(data []byte) error {
 			Action: requestPayload.Action,
 		})
 
-		if resp.Error {
-			fmt.Println("error on handlejob", resp.ErrorPayload)
+		if err != nil {
+			fmt.Println("error on handlejob", err)
+			if resp != nil {
+				fmt.Println(resp.ErrorPayload)
+			}
 		}
 	})
 	if err != nil {
