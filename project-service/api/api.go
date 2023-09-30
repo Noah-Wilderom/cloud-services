@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 )
 
@@ -19,6 +20,7 @@ func NewApi() *Api {
 }
 
 func (api *Api) sendRequest(method string, endpoint string, payload []byte) (*http.Response, string, error) {
+	log.Println("SENDING TO API")
 
 	// Create a new request with the appropriate method, URL, and payload
 	req, err := http.NewRequest(method, fmt.Sprint(apiUrl, endpoint), bytes.NewBuffer(payload))
@@ -43,6 +45,7 @@ func (api *Api) sendRequest(method string, endpoint string, payload []byte) (*ht
 	buf := new(bytes.Buffer)
 	_, _ = buf.ReadFrom(resp.Body)
 	respBody := buf.String()
+	log.Println("STATUSCODE:", resp.StatusCode)
 
 	return resp, respBody, nil
 }
