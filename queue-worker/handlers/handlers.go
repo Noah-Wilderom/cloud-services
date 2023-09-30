@@ -3,10 +3,12 @@ package handlers
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"github.com/Noah-Wilderom/cloud-services/queue-worker/logs"
 	"github.com/Noah-Wilderom/cloud-services/queue-worker/projects"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+	"log"
 	"time"
 )
 
@@ -82,12 +84,13 @@ func SendProjectJob(data []byte) error {
 
 	err := json.Unmarshal(data, &requestPayload)
 	if err != nil {
+		log.Println("Error on unmarshal")
 		return err
 	}
 
 	err = sendPayloadThroughGRPC("project-service:5004", func(conn *grpc.ClientConn, ctx context.Context) {
 		c := projects.NewProjectServiceClient(conn)
-		_, err = c.HandleJob(ctx, &projects.ProjectRequest{
+		resp, _ := c.HandleJob(ctx, &projects.ProjectRequest{
 			Project: &projects.Project{
 				Id: requestPayload.Project.Id,
 				Domain: &projects.Domain{
@@ -116,8 +119,14 @@ func SendProjectJob(data []byte) error {
 			},
 			Action: requestPayload.Action,
 		})
+
+		if resp.Error {
+			fmt.Println("error on handlejob", resp.ErrorPayload)
+		}
 	})
 	if err != nil {
+		log.Println("Error on sending to grpc")
+
 		return err
 	}
 
