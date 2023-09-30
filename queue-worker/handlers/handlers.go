@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/Noah-Wilderom/cloud-services/queue-worker/logs"
+	"github.com/Noah-Wilderom/cloud-services/queue-worker/projects"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"time"
@@ -15,6 +16,11 @@ type LogPayload struct {
 }
 
 type ProjectPayload struct {
+	Project Project `json:"project"`
+	Action  string  `json:"action"`
+}
+
+type Project struct {
 	Id           string  `json:"id"`
 	Domain       Domain  `json:"domain"`
 	Status       string  `json:"status"`
@@ -80,7 +86,36 @@ func SendProjectJob(data []byte) error {
 	}
 
 	err = sendPayloadThroughGRPC("project-service:5004", func(conn *grpc.ClientConn, ctx context.Context) {
-		//
+		c := projects.NewProjectServiceClient(conn)
+		_, err = c.HandleJob(ctx, &projects.ProjectRequest{
+			Project: &projects.Project{
+				Id: requestPayload.Project.Id,
+				Domain: &projects.Domain{
+					Id:     requestPayload.Project.Domain.Id,
+					Domain: requestPayload.Project.Domain.Domain,
+				},
+				Status:    requestPayload.Project.Status,
+				Name:      requestPayload.Project.Name,
+				Subdomain: requestPayload.Project.Subdomain,
+				Docker:    requestPayload.Project.Docker,
+				SFTP: &projects.SFTP{
+					User:     requestPayload.Project.SFTP.User,
+					Password: requestPayload.Project.SFTP.Password,
+					Path:     requestPayload.Project.SFTP.Path,
+				},
+				PreviewImage: *requestPayload.Project.PreviewImage,
+				User:         *requestPayload.Project.User,
+				SshKeyPath:   *requestPayload.Project.SshKeyPath,
+				FilesPath:    *requestPayload.Project.FilesPath,
+				Git: &projects.Git{
+					Repository: requestPayload.Project.Git.Repository,
+					WebhookUrl: requestPayload.Project.Git.WebhookUrl,
+					SshKeyPath: requestPayload.Project.Git.SshKeyPath,
+				},
+				Monitoring: requestPayload.Project.Monitoring,
+			},
+			Action: requestPayload.Action,
+		})
 	})
 	if err != nil {
 		return err
