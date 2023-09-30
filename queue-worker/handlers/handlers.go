@@ -88,8 +88,17 @@ func SendProjectJob(data []byte) error {
 		return err
 	}
 
+	if requestPayload.Project.SFTP == nil {
+		requestPayload.Project.SFTP = &SFTP{}
+	}
+
+	if requestPayload.Project.Git == nil {
+		requestPayload.Project.Git = &Git{}
+	}
+
 	err = sendPayloadThroughGRPC("project-service:5004", func(conn *grpc.ClientConn, ctx context.Context) {
 		c := projects.NewProjectServiceClient(conn)
+
 		resp, _ := c.HandleJob(ctx, &projects.ProjectRequest{
 			Project: &projects.Project{
 				Id: requestPayload.Project.Id,
