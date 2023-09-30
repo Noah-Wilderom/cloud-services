@@ -47,6 +47,15 @@ services:
       mode: replicated
       replicas: 1
 
+  project-service:
+    build:
+      context: ./project-service
+      dockerfile: ./Dockerfile
+    restart: always
+    deploy:
+      mode: replicated
+      replicas: 1
+
   postgres:
     image: 'postgres:latest'
     restart: always

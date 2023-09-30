@@ -6,18 +6,19 @@ option go_package = "/projects";
 
 message Project {
   string Id = 1;
-  string Status = 2;
-  string Name = 3;
-  string Subdomain = 4;
-  bool Docker = 5;
-  string Stack = 6;
-  SFTP SFTP = 7;
-  string PreviewImage = 8;
-  string User = 9;
-  string SshKeyPath = 10;
-  string FilesPath = 11;
-  Git Git = 12;
-  bool Monitoring = 13;
+  Domain Domain = 2;
+  string Status = 3;
+  string Name = 4;
+  string Subdomain = 5;
+  bool Docker = 6;
+  string Stack = 7;
+  SFTP SFTP = 8;
+  string PreviewImage = 9;
+  string User = 10;
+  string SshKeyPath = 11;
+  string FilesPath = 12;
+  Git Git = 13;
+  bool Monitoring = 14;
 }
 
 message SFTP {
@@ -32,13 +33,14 @@ message Git {
   string SshKeyPath = 3;
 }
 
-message DomainPayload {
-  string Service = 1;
-  bytes Data = 2;
+message Domain {
+  string Id = 1;
+  string Domain = 2;
 }
 
 message ProjectRequest {
   Project project = 1;
+  string Action = 2;
 }
 
 message ProjectResponse {
