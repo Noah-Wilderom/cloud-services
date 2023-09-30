@@ -285,7 +285,7 @@ func (j *Job) Delete() error {
 }
 
 // Insert inserts a new job into the database, and returns the ID of the newly inserted row
-func (j *Job) Insert(job Job) (*Job, error) {
+func Insert(job Job) (*Job, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
 	defer cancel()
 
@@ -301,9 +301,9 @@ func (j *Job) Insert(job Job) (*Job, error) {
 
 	err = db.QueryRowContext(ctx, stmt,
 		payloadData, // Insert the JSON-encoded payload data
-		time.Now(),
-		time.Now(),
-		time.Now(),
+		job.ReservedAt,
+		job.CreatedAt,
+		job.UpdatedAt,
 	).Scan(&newID)
 
 	if err != nil {

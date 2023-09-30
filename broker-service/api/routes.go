@@ -24,5 +24,7 @@ func (app *Config) routes() http.Handler {
 
 	mux.Post("/logger", app.LogItem)
 
+	mux.Post("/job/dispatch", app.JobDispatch)
+
 	return mux
 }

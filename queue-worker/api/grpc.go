@@ -55,6 +55,15 @@ func (q *QueueWorkerServer) HandleJob(ctx context.Context, req *queue.JobRequest
 				ErrorPayload: "Job is already reserved.",
 			}, nil
 		}
+	case "project":
+		fmt.Println("Project job received")
+		err := handlers.SendProjectJob(job.Payload.Data)
+		if err != nil {
+			return &queue.JobResponse{
+				Error:        true,
+				ErrorPayload: err.Error(),
+			}, nil
+		}
 	}
 
 	return &queue.JobResponse{

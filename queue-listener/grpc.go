@@ -9,10 +9,40 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"log"
 	"net"
+	"time"
 )
 
 type QueueListenerServer struct {
 	queue.UnimplementedQueueListenerServiceServer
+}
+
+func (q *QueueListenerServer) InsertJob(ctx context.Context, cJob *queue.Job) (*queue.Job, error) {
+	log.Println("INSERTING JOB")
+	job, err := data.Insert(data.Job{
+		Payload: data.JobPayload{
+			Service: cJob.GetPayload().GetService(),
+			Data:    cJob.GetPayload().GetData(),
+		},
+		ReservedAt: nil,
+		CreatedAt:  time.Now(),
+		UpdatedAt:  time.Now(),
+	})
+	if err != nil {
+		log.Println("error inserting database record via grpc", err)
+	}
+
+	log.Println("JOB INSERTED")
+
+	return &queue.Job{
+		Id: job.Id,
+		Payload: &queue.JobPayload{
+			Service: job.Payload.Service,
+			Data:    job.Payload.Data,
+		},
+		ReservedAt: &timestamppb.Timestamp{},
+		UpdatedAt:  timestamppb.New(job.UpdatedAt),
+		CreatedAt:  timestamppb.New(job.CreatedAt),
+	}, nil
 }
 
 func (q *QueueListenerServer) SetJobReserved(ctx context.Context, cJob *queue.Job) (*queue.Job, error) {
