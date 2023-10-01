@@ -33,6 +33,7 @@ func ProvisionProject(project *projects.Project) error {
 	if err != nil {
 		return err
 	}
+	fmt.Println(strings.ToUpper(project.Stack), strings.ToUpper(project.Stack) == "PHP")
 
 	if strings.ToUpper(project.Stack) == "PHP" {
 		files, err := helpers.ReadTemplateFiles("nginx/laravel")
@@ -41,6 +42,7 @@ func ProvisionProject(project *projects.Project) error {
 		}
 
 		for _, file := range files {
+			fmt.Println(file.Name(), strings.HasSuffix(file.Name(), "http.conf"))
 			if strings.HasSuffix(file.Name(), "http.conf") {
 				domainServerName := fullDomain
 				if len(strings.Split(fullDomain, ".")) < 3 {
@@ -55,6 +57,7 @@ func ProvisionProject(project *projects.Project) error {
 				} // TODO: PHP version moet configurable zijn
 				err := helpers.ReplaceStubVariables(file, fmt.Sprintf("/etc/nginx/sites-available/%s", fullDomain), vars)
 				if err != nil {
+					fmt.Println(err)
 					return err
 				}
 			}
