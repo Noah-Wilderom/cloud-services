@@ -35,7 +35,7 @@ func ProvisionProject(project *projects.Project) error {
 	}
 	fmt.Println(strings.ToUpper(project.GetStack()), strings.ToUpper(project.GetStack()) == "PHP")
 
-	if strings.ToUpper(project.GetStack()) == "PHP" {
+	if strings.ToUpper(project.GetStack()) == "PHP" || true { // TODO: bug fix stack not applied in create project form
 		files, err := helpers.ReadTemplateFiles("nginx/laravel")
 		if err != nil {
 			return err
