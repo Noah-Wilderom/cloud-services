@@ -10,6 +10,7 @@ import (
 )
 
 const (
+	//apiUrl = "http://localhost/api"
 	apiUrl = "http://cloudservices-site-master.test.noahdev.nl/api"
 )
 

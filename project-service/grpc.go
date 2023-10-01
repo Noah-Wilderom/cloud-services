@@ -34,6 +34,7 @@ func (app *Config) gRPCListen() {
 }
 
 func (q *ProjectServiceServer) HandleJob(ctx context.Context, request *projects.ProjectRequest) (*projects.ProjectResponse, error) {
+	log.Println("HandleJob triggered")
 	switch request.Action {
 	case "provision":
 		err := handlers.ProvisionProject(request.Project)
