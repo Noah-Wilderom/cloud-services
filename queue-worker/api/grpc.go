@@ -22,17 +22,17 @@ func (q *QueueWorkerServer) HandleJob(ctx context.Context, req *queue.JobRequest
 
 	timeNow := time.Now()
 	job := data.Job{
-		Id: input.Id,
+		Id: input.GetId(),
 		Payload: data.JobPayload{
-			Service: input.Payload.Service,
-			Data:    input.Payload.Data,
+			Service: input.GetPayload().GetService(),
+			Data:    input.GetPayload().GetData(),
 		},
 		ReservedAt: &timeNow,
-		UpdatedAt:  input.UpdatedAt.AsTime(),
-		CreatedAt:  input.CreatedAt.AsTime(),
+		UpdatedAt:  input.GetUpdatedAt().AsTime(),
+		CreatedAt:  input.GetCreatedAt().AsTime(),
 	}
 
-	if !input.ReservedAt.IsValid() {
+	if !input.GetReservedAt().IsValid() {
 		fmt.Println("Job is already reserved ERROR")
 		return &queue.JobResponse{
 			Error:        true,
@@ -44,7 +44,7 @@ func (q *QueueWorkerServer) HandleJob(ctx context.Context, req *queue.JobRequest
 		fmt.Println("error on setreserved", err)
 	}
 
-	switch input.Payload.Service {
+	switch job.Payload.Service {
 	case "logger":
 		fmt.Println("Logger job received")
 		err := handlers.SendLog(job.Payload.Data)
