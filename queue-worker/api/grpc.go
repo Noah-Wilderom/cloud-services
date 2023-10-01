@@ -19,6 +19,7 @@ type QueueWorkerServer struct {
 func (q *QueueWorkerServer) HandleJob(ctx context.Context, req *queue.JobRequest) (*queue.JobResponse, error) {
 	fmt.Println("Job received!")
 	input := req.GetJob()
+	fmt.Println(req.GetJob().Id)
 
 	timeNow := time.Now()
 	job := data.Job{
