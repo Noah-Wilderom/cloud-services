@@ -88,7 +88,9 @@ func SendProjectJob(data []byte) error {
 		return err
 	}
 
-	fmt.Println(json.Marshal(requestPayload))
+	jsonP, err := json.Marshal(requestPayload)
+
+	fmt.Println(string(jsonP))
 
 	if requestPayload.Project.SFTP == nil {
 		requestPayload.Project.SFTP = &SFTP{}
