@@ -22,7 +22,7 @@ func NewApi() *Api {
 }
 
 func (api *Api) sendRequest(method string, endpoint string, payload []byte) (*http.Response, string, error) {
-	log.Println("SENDING TO API")f
+	log.Println("SENDING TO API")
 
 	// Create a new request with the appropriate method, URL, and payload
 	req, err := http.NewRequest(method, fmt.Sprint(apiUrl, endpoint), bytes.NewBuffer(payload))
