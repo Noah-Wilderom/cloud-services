@@ -22,7 +22,7 @@ func NewApi() *Api {
 }
 
 func (api *Api) sendRequest(method string, endpoint string, payload []byte) (*http.Response, string, error) {
-	log.Println("SENDING TO API")
+	log.Println("SENDING TO API")f
 
 	// Create a new request with the appropriate method, URL, and payload
 	req, err := http.NewRequest(method, fmt.Sprint(apiUrl, endpoint), bytes.NewBuffer(payload))
@@ -33,6 +33,7 @@ func (api *Api) sendRequest(method string, endpoint string, payload []byte) (*ht
 
 	// Set the Content-Type header for JSON
 	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Accept", "application/json")
 
 	// Make the POST request
 	client := &http.Client{}
