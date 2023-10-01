@@ -19,14 +19,15 @@ type QueueWorkerServer struct {
 func (q *QueueWorkerServer) HandleJob(ctx context.Context, req *queue.JobRequest) (*queue.JobResponse, error) {
 	fmt.Println("Job received!")
 	input := req.GetJob()
-	fmt.Println(req.GetJob().Id)
+	fmt.Println(input.Id)
+	fmt.Println(input.Payload.Service)
 
 	timeNow := time.Now()
 	job := data.Job{
-		Id: input.GetId(),
+		Id: input.Id,
 		Payload: data.JobPayload{
-			Service: input.GetPayload().GetService(),
-			Data:    input.GetPayload().GetData(),
+			Service: input.Payload.Service,
+			Data:    input.Payload.Data,
 		},
 		ReservedAt: &timeNow,
 		UpdatedAt:  input.GetUpdatedAt().AsTime(),
@@ -57,7 +58,7 @@ func (q *QueueWorkerServer) HandleJob(ctx context.Context, req *queue.JobRequest
 			}, nil
 		}
 	case "project":
-		fmt.Println("Project job received", input.GetId())
+		fmt.Println("Project job received", input.Id)
 		err := handlers.SendProjectJob(job.Payload.Data)
 		if err != nil {
 			return &queue.JobResponse{
