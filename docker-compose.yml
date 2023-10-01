@@ -57,6 +57,8 @@ services:
       replicas: 1
     volumes:
       - /var/www/:/var/www
+      - /etc/nginx/sites-available:/etc/nginx/sites-available
+      - /etc/nginx/sites-enabled:/etc/nginx/sites-enabled
 
   postgres:
     image: 'postgres:latest'

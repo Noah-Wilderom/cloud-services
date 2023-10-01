@@ -16,5 +16,6 @@ FROM alpine:latest
 RUN mkdir -p /app
 
 COPY --from=builder /app/projectService /app
+COPY --from=builder /app/templates /templates
 
 CMD ["/app/projectService"]

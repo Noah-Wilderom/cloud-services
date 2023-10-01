@@ -3,9 +3,11 @@ package handlers
 import (
 	"fmt"
 	"github.com/Noah-Wilderom/cloud-services/project-service/api"
+	"github.com/Noah-Wilderom/cloud-services/project-service/helpers"
 	"github.com/Noah-Wilderom/cloud-services/project-service/projects"
 	"log"
 	"os"
+	"strings"
 )
 
 func ProvisionProject(project *projects.Project) error {
@@ -20,7 +22,8 @@ func ProvisionProject(project *projects.Project) error {
 	if subdomain != "" {
 		subdomain += "."
 	}
-	dir := fmt.Sprintf("/var/www/%s%s", subdomain, project.GetDomain().Domain)
+	fullDomain := fmt.Sprintf("%s%s", subdomain, project.GetDomain().Domain)
+	dir := fmt.Sprintf("/var/www/%s", fullDomain)
 
 	err = os.Mkdir(dir, 644)
 	if err != nil {
@@ -31,5 +34,41 @@ func ProvisionProject(project *projects.Project) error {
 		return err
 	}
 
+	if strings.ToUpper(project.Stack) == "PHP" {
+		files, err := helpers.ReadTemplateFiles("nginx/laravel")
+		if err != nil {
+			return err
+		}
+
+		for _, file := range files {
+			if strings.HasSuffix(file.Name(), "http.conf") {
+				domainServerName := fullDomain
+				if len(strings.Split(fullDomain, ".")) < 3 {
+					domainServerName = project.GetDomain().Domain
+				}
+
+				vars := map[string]string{
+					"DOMAIN_SERVER_NAME": domainServerName,
+					"DOMAIN":             fullDomain,
+					"FILES_PATH":         dir,
+					"PHP_VERSION":        "php8.1",
+				} // TODO: PHP version moet configurable zijn
+				err := helpers.ReplaceStubVariables(file, fmt.Sprintf("/etc/nginx/sites-available/%s", fullDomain), vars)
+				if err != nil {
+					return err
+				}
+			}
+		}
+	}
+
+	_, err = conn.UpdateJobStatus(project.GetId(), "running")
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
+
+//func setupNginxFiles() {
+//
+//}
