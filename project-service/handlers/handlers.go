@@ -35,7 +35,7 @@ func ProvisionProject(project *projects.Project) error {
 	}
 	fmt.Println(strings.ToUpper(project.Stack), strings.ToUpper(project.Stack) == "PHP")
 
-	if strings.ToUpper(project.Stack) == "PHP" {
+	if strings.ToUpper(project.GetStack()) == "PHP" {
 		files, err := helpers.ReadTemplateFiles("nginx/laravel")
 		if err != nil {
 			return err
