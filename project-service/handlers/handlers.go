@@ -7,9 +7,9 @@ import (
 )
 
 func ProvisionProject(project *projects.Project) error {
-	log.Println("PROVISIONPROJECT")
+	log.Println("PROVISIONPROJECT", project.GetId())
 	conn := api.NewApi()
-	_, err := conn.UpdateJobStatus(project.Id, "starting")
+	_, err := conn.UpdateJobStatus(project.GetId(), "starting")
 	if err != nil {
 		return err
 	}
