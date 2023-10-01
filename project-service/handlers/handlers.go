@@ -36,32 +36,32 @@ func ProvisionProject(project *projects.Project) error {
 	fmt.Println(strings.ToUpper(project.GetStack()), strings.ToUpper(project.GetStack()) == "PHP")
 
 	if strings.ToUpper(project.GetStack()) == "PHP" || true { // TODO: bug fix stack not applied in create project form
-		files, err := helpers.ReadTemplateFiles("nginx/laravel")
+		//files, err := helpers.ReadTemplateFiles("nginx/laravel")
+		//if err != nil {
+		//	return err
+		//}
+
+		//for _, file := range files {
+		//	fmt.Println(file.Name(), strings.HasSuffix(file.Name(), "http.conf"))
+		//	if strings.HasSuffix(file.Name(), "http.conf") {
+		domainServerName := fullDomain
+		if len(strings.Split(fullDomain, ".")) < 3 {
+			domainServerName = project.GetDomain().Domain
+		}
+
+		vars := map[string]string{
+			"DOMAIN_SERVER_NAME": domainServerName,
+			"DOMAIN":             fullDomain,
+			"FILES_PATH":         dir,
+			"PHP_VERSION":        "php8.1",
+		} // TODO: PHP version moet configurable zijn
+		err := helpers.ReplaceStubVariables("/templates/nginx/laravel/http.conf", fmt.Sprintf("/etc/nginx/sites-available/%s", fullDomain), vars)
 		if err != nil {
+			fmt.Println(err)
 			return err
 		}
-
-		for _, file := range files {
-			fmt.Println(file.Name(), strings.HasSuffix(file.Name(), "http.conf"))
-			if strings.HasSuffix(file.Name(), "http.conf") {
-				domainServerName := fullDomain
-				if len(strings.Split(fullDomain, ".")) < 3 {
-					domainServerName = project.GetDomain().Domain
-				}
-
-				vars := map[string]string{
-					"DOMAIN_SERVER_NAME": domainServerName,
-					"DOMAIN":             fullDomain,
-					"FILES_PATH":         dir,
-					"PHP_VERSION":        "php8.1",
-				} // TODO: PHP version moet configurable zijn
-				err := helpers.ReplaceStubVariables(file, fmt.Sprintf("/etc/nginx/sites-available/%s", fullDomain), vars)
-				if err != nil {
-					fmt.Println(err)
-					return err
-				}
-			}
-		}
+		//	}
+		//}
 	}
 
 	_, err = conn.UpdateJobStatus(project.GetId(), "running")

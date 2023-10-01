@@ -11,8 +11,8 @@ func ReadTemplateFiles(folder string) ([]os.DirEntry, error) {
 	return os.ReadDir(fmt.Sprintf("/templates/%s", folder))
 }
 
-func ReplaceStubVariables(file os.DirEntry, outputPath string, vars map[string]string) error {
-	f, err := os.Open(file.Name())
+func ReplaceStubVariables(file string, outputPath string, vars map[string]string) error {
+	f, err := os.Open(file)
 	if err != nil {
 		fmt.Println("Error opening file:", err)
 		return err
