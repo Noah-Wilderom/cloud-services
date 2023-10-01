@@ -88,6 +88,8 @@ func SendProjectJob(data []byte) error {
 		return err
 	}
 
+	fmt.Println(json.Marshal(requestPayload))
+
 	if requestPayload.Project.SFTP == nil {
 		requestPayload.Project.SFTP = &SFTP{}
 	}

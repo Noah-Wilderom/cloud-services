@@ -56,7 +56,7 @@ func (q *QueueWorkerServer) HandleJob(ctx context.Context, req *queue.JobRequest
 			}, nil
 		}
 	case "project":
-		fmt.Println("Project job received")
+		fmt.Println("Project job received", job.Payload.Data)
 		err := handlers.SendProjectJob(job.Payload.Data)
 		if err != nil {
 			return &queue.JobResponse{
