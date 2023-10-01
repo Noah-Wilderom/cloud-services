@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 	"github.com/Noah-Wilderom/cloud-services/queue-listener/data"
 	"github.com/Noah-Wilderom/cloud-services/queue-listener/queue"
 	"google.golang.org/grpc"
@@ -106,6 +107,8 @@ func (app *Config) SendToWorker(job *data.Job) error {
 	c := queue.NewQueueWorkerServiceClient(conn)
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
+
+	fmt.Println(string(job.Payload.Data))
 
 	jobPayload := &queue.JobPayload{
 		Service: job.Payload.Service,
