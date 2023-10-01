@@ -75,3 +75,26 @@ func (api *Api) UpdateJobStatus(id string, status string) (string, error) {
 
 	return respBody, nil
 }
+
+func (api *Api) UpdateFilesPath(id string, filepath string) (string, error) {
+	type UpdateJobFilesPathPayload struct {
+		ProjectId string `json:"project_id"`
+		FilesPath string `json:"files_path"`
+	}
+	payload := UpdateJobFilesPathPayload{
+		ProjectId: id,
+		FilesPath: filepath,
+	}
+
+	jsonPayload, err := json.Marshal(payload)
+	if err != nil {
+		return "", err
+	}
+
+	resp, respBody, err := api.sendRequest("POST", "/projects/update", jsonPayload)
+	if resp.StatusCode != http.StatusAccepted {
+		return "", errors.New(respBody)
+	}
+
+	return respBody, nil
+}
