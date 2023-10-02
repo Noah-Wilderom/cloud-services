@@ -43,8 +43,10 @@ func ReplaceStubVariables(file string, outputPath string, vars map[string]string
 			fmt.Println("Woord:", word, strings.HasPrefix(word, "{{"))
 			if strings.HasPrefix(word, "{{") {
 				for placeholder, replacement := range vars {
-					if strings.ToUpper(word) == strings.ToUpper(placeholder) || strings.ToUpper(word) == strings.ToUpper(fmt.Sprintf("{{%s}}", placeholder)) {
-						words[i] = replacement
+					if strings.Contains(strings.ToUpper(word), strings.ToUpper(placeholder)) {
+						words[i] = strings.Replace(word, replacement, "", -1)
+					} else if strings.Contains(strings.ToUpper(word), strings.ToUpper(fmt.Sprintf("{{%s}}", placeholder))) {
+						words[i] = strings.Replace(word, fmt.Sprintf("{{%s}}", replacement), "", -1)
 					}
 				}
 			}
