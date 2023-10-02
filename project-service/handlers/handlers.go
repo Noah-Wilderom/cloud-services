@@ -53,7 +53,7 @@ func ProvisionProject(project *projects.Project) error {
 			"DOMAIN_SERVER_NAME": domainServerName,
 			"DOMAIN":             fullDomain,
 			"FILES_PATH":         dir,
-			"PHP_VERSION":        "php8.1",
+			"PHP_VERSION":        "php8.2",
 		} // TODO: PHP version moet configurable zijn
 		err := helpers.ReplaceStubVariables("/templates/nginx/laravel/http.conf", fmt.Sprintf("/etc/nginx/sites-available/%s", fullDomain), vars)
 		if err != nil {

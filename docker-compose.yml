@@ -60,6 +60,12 @@ services:
       - /etc/nginx/sites-available:/etc/nginx/sites-available
       - /etc/nginx/sites-enabled:/etc/nginx/sites-enabled
 
+  chrome-headless-shell:
+    container_name: headless-shell
+    image: 'chromedp/headless-shell:latest'
+    ports:
+      - "9222:9222"
+
   postgres:
     image: 'postgres:latest'
     restart: always
