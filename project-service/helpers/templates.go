@@ -41,13 +41,15 @@ func ReplaceStubVariables(file string, outputPath string, vars map[string]string
 
 		// Replace specific words in the line
 		for i, word := range words {
-			if strings.HasPrefix(word, "{{") {
+			if strings.Contains(word, "{{") {
 				fmt.Println("Woord:", word)
 				for placeholder, replacement := range vars {
 					if strings.Contains(word, placeholder) {
 						if strings.Contains(word, "{{") || strings.Contains(word, "}}") {
-							words[i] = strings.Replace(word, "{{", "", -1)
-							words[i] = strings.Replace(word, "}}", "", -1)
+							fmt.Println("shoudl be found!! x3")
+							word = strings.Replace(word, "{{", "", -1)
+							word = strings.Replace(word, "}}", "", -1)
+							fmt.Println("Should not contain any {{ or }}", word)
 						}
 
 						words[i] = strings.Replace(word, placeholder, replacement, -1)
