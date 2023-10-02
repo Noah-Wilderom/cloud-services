@@ -60,6 +60,12 @@ func ProvisionProject(project *projects.Project) error {
 			fmt.Println(err)
 			return err
 		}
+
+		err = os.Symlink(fmt.Sprintf("/etc/nginx/sites-available/%s", fullDomain), fmt.Sprintf("/etc/nginx/sites-enabled/%s", fullDomain))
+		if err != nil {
+			fmt.Println(err)
+			return err
+		}
 		//	}
 		//}
 	}
