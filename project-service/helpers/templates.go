@@ -3,6 +3,7 @@ package helpers
 import (
 	"bufio"
 	"fmt"
+	"log"
 	"os"
 	"strings"
 )
@@ -43,12 +44,20 @@ func ReplaceStubVariables(file string, outputPath string, vars map[string]string
 			if strings.HasPrefix(word, "{{") {
 				fmt.Println("Woord:", word)
 				for placeholder, replacement := range vars {
-					fmt.Println("Placeholder:", placeholder, "Replacement:", replacement, strings.Contains(strings.ToUpper(word), strings.ToUpper(placeholder)), strings.Contains(strings.ToUpper(word), strings.ToUpper(fmt.Sprintf("{{%s}}", placeholder))))
-					if strings.Contains(strings.ToUpper(word), strings.ToUpper(placeholder)) {
-						words[i] = strings.Replace(word, replacement, "", -1)
-					} else if strings.Contains(strings.ToUpper(word), strings.ToUpper(fmt.Sprintf("{{%s}}", placeholder))) {
-						words[i] = strings.Replace(word, fmt.Sprintf("{{%s}}", replacement), "", -1)
+					if strings.Contains(word, placeholder) {
+						if strings.Contains(word, "{{") || strings.Contains(word, "}}") {
+							words[i] = strings.Replace(word, "{{", "", -1)
+							words[i] = strings.Replace(word, "}}", "", -1)
+						}
+
+						words[i] = strings.Replace(word, placeholder, replacement, -1)
+						break
 					}
+					//if strings.Contains(strings.ToUpper(word), strings.ToUpper(placeholder)) {
+					//	words[i] = strings.Replace(word, replacement, "", -1)
+					//} else if strings.Contains(strings.ToUpper(word), strings.ToUpper(fmt.Sprintf("{{%s}}", placeholder))) {
+					//	words[i] = strings.Replace(word, fmt.Sprintf("{{%s}}", replacement), "", -1)
+					//}
 				}
 			}
 		}
@@ -59,6 +68,7 @@ func ReplaceStubVariables(file string, outputPath string, vars map[string]string
 		// Write the modified line to the output file
 		_, err := fmt.Fprintln(writer, modifiedLine)
 		if err != nil {
+			log.Println("ERROR WRITER", err)
 			return err
 		}
 	}
@@ -69,7 +79,11 @@ func ReplaceStubVariables(file string, outputPath string, vars map[string]string
 	}
 
 	// Flush the writer to ensure all data is written to the output file
-	writer.Flush()
+	err = writer.Flush()
+	if err != nil {
+		log.Println("ERROR WRITER FLUSH", err)
+		return err
+	}
 
 	return nil
 }
