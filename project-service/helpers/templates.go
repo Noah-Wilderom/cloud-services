@@ -40,6 +40,7 @@ func ReplaceStubVariables(file string, outputPath string, vars map[string]string
 
 		// Replace specific words in the line
 		for i, word := range words {
+			fmt.Println("Woord:", word, strings.HasPrefix(word, "{{"))
 			if strings.HasPrefix(word, "{{") {
 				for placeholder, replacement := range vars {
 					if strings.ToUpper(word) == strings.ToUpper(placeholder) || strings.ToUpper(word) == strings.ToUpper(fmt.Sprintf("{{%s}}", placeholder)) {
