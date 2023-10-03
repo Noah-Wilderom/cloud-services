@@ -151,6 +151,8 @@ nginx_config=$(echo "$nginx_config_template" | \
                sed "s|\$DOMAIN_SERVER_NAME|${DOMAIN}|g; \
                     s|\$FILES_PATH|${FILES_PATH}|g; \
                     s|\$PHP_VERSION|${PHP_VERSION}|g")
+
+mkdir -p /etc/nginx/sites-available/server
 echo "$nginx_config" > /etc/nginx/sites-available/server/$DOMAIN
 ln -s /etc/nginx/sites-available/server/$DOMAIN /etc/nginx/sites-enabled/$DOMAIN
 systemctl restart nginx

@@ -24,6 +24,7 @@ func navigateAndTakeScreenshot(url string) chromedp.Tasks {
 	if err := os.WriteFile("fullScreenshot.png", buf, 0o644); err != nil {
 		log.Fatal(err)
 	}
+	return chromedp.Tasks{}
 
 }
 
