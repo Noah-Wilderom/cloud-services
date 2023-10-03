@@ -1,4 +1,8 @@
 #!/bin/bash
+if [ -z "$1" ]; then
+    echo "Error: Domain name is missing. Usage: $0 <domain>"
+    exit 1
+fi
 
 apt -y update
 apt install -y openssl
@@ -106,8 +110,7 @@ php ~/cloud-services/site/artisan key:generate
 php ~/cloud-services/site/artisan test || echo "Setup Failed!!!"
 php ~/cloud-services/site/artisan install:cloud-services --db-database="$DB_DATABASE" --db-password="$DB_PASSWORD" || echo "Setup Failed!!!"
 
-echo "Please enter your domain:"
-read DOMAIN
+DOMAIN="$1"
 
 FILES_PATH=/var/www/server/$DOMAIN
 mkdir -p $FILES_PATH
@@ -163,3 +166,5 @@ nginx -t
 echo "Finishing up..."
 apt update && apt -y upgrade
 apt autoremove
+
+
