@@ -44,7 +44,7 @@ ufw allow 'Nginx Full'
 
 # Install Certbot
 echo "Installing certbot"
-apt install snapd
+apt install -y snapd
 snap install --classic certbot
 ln -s /snap/bin/certbot /usr/bin/certbot
 
@@ -98,13 +98,13 @@ docker-compose up -d --build || echo "Setup Failed!!!"
 # Setting up site
 echo "Installing Site"
 git clone git@git.noahdev.nl:cloudservices/site.git ~/cloud-services/site
-chmod -R 655 storage/
-chmod -R 655 bootstrap/
-cp .env.production .env
-composer install --no-plugins --optimize-autoloader --no-interaction --no-scripts
-php artisan key:generate
-php artisan test || echo "Setup Failed!!!"
-php artisan install:cloud-services --db-database="$DB_DATABASE" --db-password="$DB_PASSWORD" || echo "Setup Failed!!!"
+chmod -R 655 ~/cloud-services/site/storage/
+chmod -R 655 ~/cloud-services/site/bootstrap/
+cp ~/cloud-services/site/.env.production ~/cloud-services/site/.env
+cd ~/cloud-services/site && composer install --no-plugins --optimize-autoloader --no-interaction --no-scripts
+php ~/cloud-services/site/artisan key:generate
+php ~/cloud-services/site/artisan test || echo "Setup Failed!!!"
+php ~/cloud-services/site/artisan install:cloud-services --db-database="$DB_DATABASE" --db-password="$DB_PASSWORD" || echo "Setup Failed!!!"
 
 echo "Please enter your domain:"
 read DOMAIN
