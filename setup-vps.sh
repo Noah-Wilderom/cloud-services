@@ -165,6 +165,8 @@ ln -s /etc/nginx/sites-available/server/$DOMAIN /etc/nginx/sites-enabled/$DOMAIN
 systemctl restart nginx
 nginx -t
 
+ssh-keygen -t rsa -b 4096 -N "" -f ~/.ssh/id_rsa
+
 # Creating admin site user
 
 echo "Finishing up..."

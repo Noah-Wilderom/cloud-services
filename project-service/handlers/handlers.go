@@ -70,6 +70,10 @@ func ProvisionProject(project *projects.Project) error {
 		//}
 	}
 
+	if len(project.GetGit().Repository) > 1 {
+		fmt.Println("Git enabled")
+	}
+
 	_, err = conn.UpdateJobStatus(project.GetId(), "running")
 	if err != nil {
 		return err

@@ -26,5 +26,7 @@ func (app *Config) routes() http.Handler {
 
 	mux.Post("/job/dispatch", app.JobDispatch)
 
+	mux.Get("/public-key", app.GetPublicKey)
+
 	return mux
 }

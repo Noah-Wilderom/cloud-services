@@ -8,6 +8,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"net/http"
+	"os"
 	"time"
 )
 
@@ -57,6 +58,19 @@ func (app *Config) LogItem(w http.ResponseWriter, r *http.Request) {
 	}
 
 	_ = app.WriteJson(w, http.StatusAccepted, payload)
+}
+
+func (app *Config) GetPublicKey(w http.ResponseWriter, r *http.Request) {
+	file, err := os.ReadFile("~/.ssh/id_rsa.pub")
+	if err != nil {
+		_ = app.ErrorJson(w, err)
+	}
+
+	type responsePayload struct {
+		PublicKey string `json:"public_key"`
+	}
+
+	_ = app.WriteJson(w, 202, responsePayload{PublicKey: string(file)})
 }
 
 func (app *Config) JobDispatch(w http.ResponseWriter, r *http.Request) {
