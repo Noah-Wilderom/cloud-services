@@ -70,7 +70,7 @@ func (app *Config) GetPublicKey(w http.ResponseWriter, r *http.Request) {
 		PublicKey string `json:"public_key"`
 	}
 
-	_ = app.WriteJson(w, 202, responsePayload{PublicKey: string(file)})
+	_ = app.WriteJson(w, http.StatusAccepted, responsePayload{PublicKey: string(file)})
 }
 
 func (app *Config) JobDispatch(w http.ResponseWriter, r *http.Request) {
