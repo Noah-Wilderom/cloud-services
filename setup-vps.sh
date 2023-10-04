@@ -83,7 +83,7 @@ ufw allow 6379
 
 # Setup MySQL
 echo "Installing MySQL"
-DB_DATABASE="cloud-services-site"
+DB_DATABASE="cloud_services_site"
 DB_USER=$DB_DATABASE
 DB_PASSWORD=$(generate_random_str)
 
