@@ -109,13 +109,14 @@ DOMAIN="$1"
 FILES_PATH=/var/www/server/$DOMAIN
 mkdir -p $FILES_PATH
 git clone git@git.noahdev.nl:cloudservices/site.git $FILES_PATH
-chmod -R a+rw $FILES_PATH/storage
+chmod -R a+rw $FILES_PATH/storage/
 chmod -R a+rw $FILES_PATH/bootstrap/
 cp $FILES_PATH/.env.production $FILES_PATH/.env
 cd $FILES_PATH && composer install --no-plugins --optimize-autoloader --no-interaction --no-scripts
 php $FILES_PATH/artisan key:generate
-php $FILES_PATH/artisan test || echo "Setup Failed!!!"
-php $FILES_PATH/artisan install:cloud-services --db-database="$DB_DATABASE" --db-password="$DB_PASSWORD" || echo "Setup Failed!!!"
+#php $FILES_PATH/artisan test || echo "Setup Failed!!!"
+php $FILES_PATH/artisan app:adjust-env --db-database="$DB_DATABASE" --db-password="$DB_PASSWORD" || echo "Setup Failed!!!"
+php $FILES_PATH/artisan install:cloud-services || echo "Setup Failed!!!"
 
 
 nginx_config_template="server {
