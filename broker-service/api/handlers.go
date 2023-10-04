@@ -66,11 +66,12 @@ func (app *Config) GetPublicKey(w http.ResponseWriter, r *http.Request) {
 		_ = app.ErrorJson(w, err)
 	}
 
-	type responsePayload struct {
-		PublicKey string `json:"public_key"`
+	payload := JsonResponse{
+		Error:   false,
+		Message: string(file),
 	}
 
-	_ = app.WriteJson(w, http.StatusAccepted, responsePayload{PublicKey: string(file)})
+	_ = app.WriteJson(w, http.StatusAccepted, payload)
 }
 
 func (app *Config) JobDispatch(w http.ResponseWriter, r *http.Request) {
