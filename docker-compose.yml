@@ -13,7 +13,7 @@ services:
       mode: replicated
       replicas: 1
     volumes:
-      - ~/.ssh:~/.ssh
+      - ~/.ssh:/root/.ssh
 
 
   logger-service:
@@ -62,7 +62,7 @@ services:
       - /var/www/:/var/www
       - /etc/nginx/sites-available:/etc/nginx/sites-available
       - /etc/nginx/sites-enabled:/etc/nginx/sites-enabled
-      - ~/.ssh:~/.ssh
+      - ~/.ssh:/root/.ssh
 
   chrome-headless-shell:
     container_name: headless-shell
