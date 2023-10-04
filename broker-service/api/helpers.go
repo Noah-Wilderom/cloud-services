@@ -33,6 +33,11 @@ func (app *Config) readJson(w http.ResponseWriter, r *http.Request, data any) er
 }
 
 func (app *Config) WriteJson(w http.ResponseWriter, status int, data any, headers ...http.Header) error {
+	if w.Header().Get("Content-Type") == "" {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(status)
+	}
+
 	out, err := json.Marshal(data)
 	if err != nil {
 		return err
@@ -44,8 +49,6 @@ func (app *Config) WriteJson(w http.ResponseWriter, status int, data any, header
 		}
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(status)
 	_, err = w.Write(out)
 	if err != nil {
 		return err
