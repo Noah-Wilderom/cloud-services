@@ -89,7 +89,8 @@ DB_PASSWORD=$(generate_random_str)
 
 apt install -y mysql-server
 systemctl start mysql.service
-mysql -e "CREATE USER '$DB_USER'@'localhost' IDENTIFIED BY '$DB_PASSWORD';CREATE DATABASE IF NOT EXISTS '$DB_DATABASE';FLUSH PRIVILEGES;"
+mysql -e "CREATE DATABASE IF NOT EXISTS '$DB_DATABASE';"
+mysql -e "CREATE USER '$DB_USER'@'localhost' IDENTIFIED BY '$DB_PASSWORD';FLUSH PRIVILEGES;"
 mysql -e "GRANT ALL PRIVILEGES ON *.* TO '$DB_USER'@'localhost' WITH GRANT OPTION;FLUSH PRIVILEGES;"
 # Setup SFTP
 echo "Installing SFTP server"
