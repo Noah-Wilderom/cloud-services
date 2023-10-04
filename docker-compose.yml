@@ -12,6 +12,9 @@ services:
     deploy:
       mode: replicated
       replicas: 1
+    volumes:
+      - ~/.ssh:~/.ssh
+
 
   logger-service:
     build:
