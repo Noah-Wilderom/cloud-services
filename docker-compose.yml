@@ -59,6 +59,7 @@ services:
       - /var/www/:/var/www
       - /etc/nginx/sites-available:/etc/nginx/sites-available
       - /etc/nginx/sites-enabled:/etc/nginx/sites-enabled
+      - ~/.ssh:~/.ssh
 
   chrome-headless-shell:
     container_name: headless-shell
