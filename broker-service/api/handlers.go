@@ -61,9 +61,10 @@ func (app *Config) LogItem(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *Config) GetPublicKey(w http.ResponseWriter, r *http.Request) {
-	file, err := os.ReadFile("~/.ssh/id_rsa.pub")
+	file, err := os.ReadFile("/root/.ssh/id_rsa.pub")
 	if err != nil {
 		_ = app.ErrorJson(w, err)
+		return
 	}
 
 	payload := JsonResponse{
