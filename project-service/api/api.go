@@ -118,7 +118,7 @@ func (api *Api) UpdateScreenshot(id string, image []byte) error {
 		return err
 	}
 
-	resp, respBody, err := api.sendRequest("POST", "projects/update", jsonPayload)
+	resp, respBody, err := api.sendRequest("POST", "/projects/update", jsonPayload)
 	if resp.StatusCode != http.StatusAccepted {
 		return errors.New(respBody)
 	}
