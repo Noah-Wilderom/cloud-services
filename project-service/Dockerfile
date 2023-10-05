@@ -14,7 +14,6 @@ RUN chmod +x /app/projectService
 FROM alpine:latest
 
 RUN mkdir -p /app
-RUN apt -y install chromium
 
 COPY --from=builder /app/projectService /app
 COPY --from=builder /app/templates /templates
