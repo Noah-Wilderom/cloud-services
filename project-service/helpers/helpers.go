@@ -2,8 +2,11 @@ package helpers
 
 import (
 	"context"
+	"fmt"
 	"github.com/chromedp/chromedp"
 	"log"
+	"os"
+	"path/filepath"
 )
 
 func NavigateAndTakeScreenshot(url string) []byte {
@@ -29,4 +32,21 @@ func fullScreenshot(urlstr string, quality int, res *[]byte) chromedp.Tasks {
 		chromedp.Navigate(urlstr),
 		chromedp.FullScreenshot(res, quality),
 	}
+}
+
+func RemoveAllFilesInDirectory(directoryPath string) error {
+	dirEntries, err := os.ReadDir(directoryPath)
+	if err != nil {
+		return fmt.Errorf("failed to read directory: %v", err)
+	}
+
+	for _, entry := range dirEntries {
+		err := os.RemoveAll(filepath.Join(directoryPath, entry.Name()))
+		if err != nil {
+			return fmt.Errorf("failed to remove file or directory %s: %v", entry.Name(), err)
+		}
+		fmt.Println("Removed:", entry.Name())
+	}
+
+	return nil
 }

@@ -25,7 +25,11 @@ func ProvisionProject(project *projects.Project) error {
 	fullDomain := fmt.Sprintf("%s%s", subdomain, project.GetDomain().Domain)
 	dir := fmt.Sprintf("/var/www/%s", fullDomain)
 
-	err = os.Mkdir(dir, 644)
+	if _, err = os.Stat(dir); err != nil {
+		err = helpers.RemoveAllFilesInDirectory(dir)
+	}
+
+	err = os.MkdirAll(dir, 644)
 	if err != nil {
 		return err
 	}
