@@ -53,13 +53,18 @@ func ProvisionProject(project *projects.Project) error {
 			"FILES_PATH":         dir,
 			"PHP_VERSION":        "php8.2",
 		} // TODO: PHP version moet configurable zijn
-		err := helpers.ReplaceStubVariables("/templates/nginx/laravel/http.conf", fmt.Sprintf("/etc/nginx/sites-available/%s", fullDomain), vars)
+		confPath := fmt.Sprintf("/etc/nginx/sites-available/%s", fullDomain)
+		err := helpers.ReplaceStubVariables("/templates/nginx/laravel/http.conf", confPath, vars)
 		if err != nil {
 			fmt.Println(err)
 			return err
 		}
 
-		err = os.Symlink(fmt.Sprintf("/etc/nginx/sites-available/%s", fullDomain), fmt.Sprintf("/etc/nginx/sites-enabled/%s", fullDomain))
+		symLink := fmt.Sprintf("/etc/nginx/sites-enabled/%s", fullDomain)
+		if _, err = os.Stat(symLink); err != nil {
+			_ = os.Remove(symLink)
+		}
+		err = os.Symlink(confPath, symLink)
 		if err != nil {
 			fmt.Println(err)
 			return err

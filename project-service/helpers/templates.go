@@ -23,6 +23,9 @@ func ReplaceStubVariables(file string, outputPath string, vars map[string]string
 	scanner := bufio.NewScanner(f)
 
 	// Create an output file
+	if _, err = os.Stat(outputPath); err != nil {
+		_ = os.Remove(outputPath)
+	}
 	outputFile, err := os.Create(outputPath)
 	if err != nil {
 		return err
