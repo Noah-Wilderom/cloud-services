@@ -67,7 +67,6 @@ func ProvisionProject(project *projects.Project) error {
 		err = os.Symlink(confPath, symLink)
 		if err != nil {
 			fmt.Println(err)
-			return err
 		}
 
 	}
