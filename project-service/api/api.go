@@ -103,7 +103,7 @@ func (api *Api) UpdateFilesPath(id string, filepath string) (string, error) {
 func (api *Api) UpdateScreenshot(id string, image []byte) error {
 	type UpdateScreenshotPayload struct {
 		ProjectId    string `json:"project_id"`
-		PreviewImage string `json:"preview_image"`
+		PreviewImage string `json:"preview_img"`
 	}
 
 	encodedScreenshot := base64.StdEncoding.EncodeToString(image)
