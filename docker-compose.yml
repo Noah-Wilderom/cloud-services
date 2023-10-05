@@ -58,6 +58,9 @@ services:
     deploy:
       mode: replicated
       replicas: 1
+    environment:
+      - PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
+
     volumes:
       - /var/www/:/var/www
       - /etc/nginx/sites-available:/etc/nginx/sites-available
