@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -97,4 +98,30 @@ func (api *Api) UpdateFilesPath(id string, filepath string) (string, error) {
 	}
 
 	return respBody, nil
+}
+
+func (api *Api) UpdateScreenshot(id string, image []byte) error {
+	type UpdateScreenshotPayload struct {
+		ProjectId    string `json:"project_id"`
+		PreviewImage string `json:"preview_image"`
+	}
+
+	encodedScreenshot := base64.StdEncoding.EncodeToString(image)
+
+	payload := UpdateScreenshotPayload{
+		ProjectId:    id,
+		PreviewImage: encodedScreenshot,
+	}
+
+	jsonPayload, err := json.Marshal(payload)
+	if err != nil {
+		return err
+	}
+
+	resp, respBody, err := api.sendRequest("POST", "projects/update", jsonPayload)
+	if resp.StatusCode != http.StatusAccepted {
+		return errors.New(respBody)
+	}
+
+	return nil
 }

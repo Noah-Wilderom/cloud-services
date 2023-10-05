@@ -29,6 +29,7 @@ func ProvisionProject(project *projects.Project) error {
 	if err != nil {
 		return err
 	}
+
 	_, err = conn.UpdateFilesPath(project.GetId(), dir)
 	if err != nil {
 		return err
@@ -36,14 +37,7 @@ func ProvisionProject(project *projects.Project) error {
 	fmt.Println(strings.ToUpper(project.GetStack()), strings.ToUpper(project.GetStack()) == "PHP")
 
 	if strings.ToUpper(project.GetStack()) == "PHP" || true { // TODO: bug fix stack not applied in create project form
-		//files, err := helpers.ReadTemplateFiles("nginx/laravel")
-		//if err != nil {
-		//	return err
-		//}
 
-		//for _, file := range files {
-		//	fmt.Println(file.Name(), strings.HasSuffix(file.Name(), "http.conf"))
-		//	if strings.HasSuffix(file.Name(), "http.conf") {
 		domainServerName := fullDomain
 		if len(strings.Split(fullDomain, ".")) < 3 {
 			domainServerName = project.GetDomain().Domain
@@ -66,9 +60,11 @@ func ProvisionProject(project *projects.Project) error {
 			fmt.Println(err)
 			return err
 		}
-		//	}
-		//}
+
 	}
+
+	image := helpers.NavigateAndTakeScreenshot(fmt.Sprintf("http://%s", fullDomain))
+	err = conn.UpdateScreenshot(project.GetId(), image)
 
 	if len(project.GetGit().Repository) > 1 {
 		fmt.Println("Git enabled")
@@ -81,7 +77,3 @@ func ProvisionProject(project *projects.Project) error {
 
 	return nil
 }
-
-//func setupNginxFiles() {
-//
-//}
