@@ -106,6 +106,10 @@ func Git(project *projects.Project) error {
 	_ = cmd.Run()
 	cmd = exec.Command("git", "config", "--global", "--add", "safe.directory", dir)
 	_ = cmd.Run()
+	cmd = exec.Command("git", "config", "--global", "user.email", "runner@cloud-services.com")
+	_ = cmd.Run()
+	cmd = exec.Command("git", "config", "--global", "user.name", "Cloud Services Runner")
+	_ = cmd.Run()
 
 	cmd = exec.Command("git", "pull", "origin", "HEAD")
 	if _, err := os.Stat(filepath.Join(project.FilesPath, ".git")); err != nil {
