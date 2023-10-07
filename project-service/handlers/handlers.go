@@ -90,6 +90,8 @@ func Git(project *projects.Project) error {
 	}
 	fmt.Println(project.FilesPath, project.GetGit().Repository)
 
+	os.Setenv("GIT_SSH_COMMAND", "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null")
+
 	cmd := exec.Command("git", "pull", "origin", "HEAD")
 	if _, err := os.Stat(filepath.Join(project.FilesPath, ".git")); err != nil {
 		cmd = exec.Command("git", "clone", project.GetGit().Repository, project.FilesPath)
