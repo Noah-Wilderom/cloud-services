@@ -14,7 +14,7 @@ RUN chmod +x /app/projectService
 FROM alpine:latest
 
 RUN mkdir -p /app
-RUN apk add chromium
+RUN apk add chromium git
 
 COPY --from=builder /app/projectService /app
 COPY --from=builder /app/templates /templates
