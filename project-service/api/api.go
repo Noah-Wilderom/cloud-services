@@ -102,24 +102,23 @@ func (api *Api) UpdateFilesPath(id string, filepath string) (string, error) {
 
 func (api *Api) UpdateScreenshot(id string, image []byte) error {
 	type UpdateScreenshotPayload struct {
-		ProjectId    string `json:"project_id"`
-		PreviewImage string `json:"preview_img"`
+		ProjectId string `json:"project_id"`
+		Image     string `json:"image"`
 	}
 
 	encodedScreenshot := base64.StdEncoding.EncodeToString(image)
 
 	payload := UpdateScreenshotPayload{
-		ProjectId:    id,
-		PreviewImage: encodedScreenshot,
+		ProjectId: id,
+		Image:     encodedScreenshot,
 	}
 
 	jsonPayload, err := json.Marshal(payload)
 	if err != nil {
 		return err
 	}
-	fmt.Println(encodedScreenshot)
 
-	resp, respBody, err := api.sendRequest("POST", "/projects/update", jsonPayload)
+	resp, respBody, err := api.sendRequest("POST", "/projects/preview-image", jsonPayload)
 	if resp.StatusCode != http.StatusAccepted {
 		return errors.New(respBody)
 	}
