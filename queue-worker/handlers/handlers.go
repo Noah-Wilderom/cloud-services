@@ -126,7 +126,6 @@ func SendProjectJob(data []byte) error {
 				Git: &projects.Git{
 					Repository: requestPayload.Project.Git.Repository,
 					WebhookUrl: requestPayload.Project.Git.WebhookUrl,
-					SshKeyPath: requestPayload.Project.Git.SshKeyPath,
 				},
 				Monitoring: requestPayload.Project.Monitoring,
 			},
