@@ -85,10 +85,18 @@ func ProvisionProject(project *projects.Project) error {
 	return nil
 }
 func Git(project *projects.Project) error {
-	if len(project.GetGit().Repository) < 1 {
+	conn := api.NewApi()
+
+	if len(project.GetGit().Repository) < 1 || len(project.FilesPath) < 1 {
 		return errors.New("Git is not enabled yet")
 	}
-	fmt.Println(project.FilesPath, project.GetGit().Repository)
+
+	subdomain := project.GetSubdomain()
+	if subdomain != "" {
+		subdomain += "."
+	}
+	fullDomain := fmt.Sprintf("%s%s", subdomain, project.GetDomain().Domain)
+	dir := fmt.Sprintf("/var/www/%s", fullDomain)
 
 	os.Setenv("GIT_SSH_COMMAND", "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null")
 
@@ -97,13 +105,18 @@ func Git(project *projects.Project) error {
 		cmd = exec.Command("git", "clone", project.GetGit().Repository, project.FilesPath)
 	}
 
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-
 	err := cmd.Run()
 	if err != nil {
 		return errors.New(fmt.Sprintln("Error cloning/pulling repository:", err))
 	}
+
+	cmd = exec.Command("chmod", "-R", "755", dir)
+	_ = cmd.Run()
+	cmd = exec.Command("chown", "-R", "www-data:www-data", dir)
+	_ = cmd.Run()
+
+	image := helpers.NavigateAndTakeScreenshot(fmt.Sprintf("http://%s", fullDomain))
+	err = conn.UpdateScreenshot(project.GetId(), image)
 
 	return nil
 }
