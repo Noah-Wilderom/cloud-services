@@ -74,8 +74,12 @@ func ProvisionProject(project *projects.Project) error {
 
 	}
 
-	image := helpers.NavigateAndTakeScreenshot(fmt.Sprintf("http://%s", fullDomain))
-	err = conn.UpdateScreenshot(project.GetId(), image)
+	image, err := helpers.NavigateAndTakeScreenshot(fmt.Sprintf("http://%s", fullDomain))
+	if err != nil {
+		log.Println(err)
+	} else {
+		err = conn.UpdateScreenshot(project.GetId(), image)
+	}
 
 	_, err = conn.UpdateJobStatus(project.GetId(), "running")
 	if err != nil {
@@ -121,8 +125,12 @@ func Git(project *projects.Project) error {
 		return errors.New(fmt.Sprintln("Error cloning/pulling repository:", err))
 	}
 
-	image := helpers.NavigateAndTakeScreenshot(fmt.Sprintf("http://%s", fullDomain))
-	err = conn.UpdateScreenshot(project.GetId(), image)
+	image, err := helpers.NavigateAndTakeScreenshot(fmt.Sprintf("http://%s", fullDomain))
+	if err != nil {
+		log.Println(err)
+	} else {
+		err = conn.UpdateScreenshot(project.GetId(), image)
+	}
 
 	return nil
 }

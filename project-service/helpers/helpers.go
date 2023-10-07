@@ -4,12 +4,11 @@ import (
 	"context"
 	"fmt"
 	"github.com/chromedp/chromedp"
-	"log"
 	"os"
 	"path/filepath"
 )
 
-func NavigateAndTakeScreenshot(url string) []byte {
+func NavigateAndTakeScreenshot(url string) ([]byte, error) {
 	// create context
 	ctx, cancel := chromedp.NewContext(
 		context.Background(),
@@ -21,10 +20,10 @@ func NavigateAndTakeScreenshot(url string) []byte {
 	var buf []byte
 	// capture entire browser viewport, returning png with quality=90
 	if err := chromedp.Run(ctx, fullScreenshot(url, 90, &buf)); err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
-	return buf
+	return buf, nil
 }
 
 func fullScreenshot(urlstr string, quality int, res *[]byte) chromedp.Tasks {
