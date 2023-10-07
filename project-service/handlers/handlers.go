@@ -88,7 +88,7 @@ func Git(project *projects.Project) error {
 	if len(project.GetGit().Repository) < 1 {
 		return errors.New("Git is not enabled yet")
 	}
-	fmt.Println(project.GetFilesPath(), project.GetGit().Repository)
+	fmt.Println(project.FilesPath, project.GetGit().Repository)
 
 	cmd := exec.Command("git", "pull", "origin", "HEAD")
 	if _, err := os.Stat(filepath.Join(project.FilesPath, ".git")); err != nil {
