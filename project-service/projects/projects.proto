@@ -30,7 +30,6 @@ message SFTP {
 message Git {
   string Repository = 1;
   string WebhookUrl = 2;
-  string SshKeyPath = 3;
 }
 
 message Domain {

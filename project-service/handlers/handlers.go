@@ -1,12 +1,15 @@
 package handlers
 
 import (
+	"errors"
 	"fmt"
 	"github.com/Noah-Wilderom/cloud-services/project-service/api"
 	"github.com/Noah-Wilderom/cloud-services/project-service/helpers"
 	"github.com/Noah-Wilderom/cloud-services/project-service/projects"
 	"log"
 	"os"
+	"os/exec"
+	"path/filepath"
 	"strings"
 )
 
@@ -74,13 +77,29 @@ func ProvisionProject(project *projects.Project) error {
 	image := helpers.NavigateAndTakeScreenshot(fmt.Sprintf("http://%s", fullDomain))
 	err = conn.UpdateScreenshot(project.GetId(), image)
 
-	if len(project.GetGit().Repository) > 1 {
-		fmt.Println("Git enabled")
-	}
-
 	_, err = conn.UpdateJobStatus(project.GetId(), "running")
 	if err != nil {
 		return err
+	}
+
+	return nil
+}
+func Git(project *projects.Project) error {
+	if len(project.GetGit().Repository) < 1 {
+		return errors.New("Git is not enabled yet")
+	}
+
+	cmd := exec.Command("git", "pull", "origin", "HEAD")
+	if _, err := os.Stat(filepath.Join(project.FilesPath, ".git")); err != nil {
+		cmd = exec.Command("git", "clone", project.GetGit().Repository, project.FilesPath)
+	}
+
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+
+	err := cmd.Run()
+	if err != nil {
+		return errors.New(fmt.Sprintln("Error cloning/pulling repository:", err))
 	}
 
 	return nil

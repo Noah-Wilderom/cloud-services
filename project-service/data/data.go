@@ -25,7 +25,6 @@ type SFTP struct {
 type Git struct {
 	Repository string `json:"repository"`
 	WebhookUrl string `json:"webhook_url"`
-	SshKeyPath string `json:"ssh_key_path"`
 }
 
 type Domain struct {

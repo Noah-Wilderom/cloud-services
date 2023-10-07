@@ -45,6 +45,15 @@ func (q *ProjectServiceServer) HandleJob(ctx context.Context, request *projects.
 				ErrorPayload: err.Error(),
 			}, nil
 		}
+	case "git":
+		err := handlers.Git(request.GetProject())
+		if err != nil {
+			log.Println("error on git project", err)
+			return &projects.ProjectResponse{
+				Error:        true,
+				ErrorPayload: err.Error(),
+			}, nil
+		}
 	default:
 		return &projects.ProjectResponse{
 			Error:        true,
