@@ -100,7 +100,14 @@ func Git(project *projects.Project) error {
 
 	os.Setenv("GIT_SSH_COMMAND", "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null")
 
-	cmd := exec.Command("git", "pull", "origin", "HEAD")
+	cmd := exec.Command("chmod", "-R", "755", dir)
+	_ = cmd.Run()
+	cmd = exec.Command("chown", "-R", "www-data:www-data", dir)
+	_ = cmd.Run()
+	cmd = exec.Command("git", "config", "--global", "--add", "safe.directory", dir)
+	_ = cmd.Run()
+
+	cmd = exec.Command("git", "pull", "origin", "HEAD")
 	if _, err := os.Stat(filepath.Join(project.FilesPath, ".git")); err != nil {
 		cmd = exec.Command("git", "clone", project.GetGit().Repository, project.FilesPath)
 	}
@@ -109,13 +116,6 @@ func Git(project *projects.Project) error {
 	if err != nil {
 		return errors.New(fmt.Sprintln("Error cloning/pulling repository:", err))
 	}
-
-	cmd = exec.Command("chmod", "-R", "755", dir)
-	_ = cmd.Run()
-	cmd = exec.Command("chown", "-R", "www-data:www-data", dir)
-	_ = cmd.Run()
-	cmd = exec.Command("git", "config", "--global", "--add", "safe.directory", dir)
-	_ = cmd.Run()
 
 	image := helpers.NavigateAndTakeScreenshot(fmt.Sprintf("http://%s", fullDomain))
 	err = conn.UpdateScreenshot(project.GetId(), image)
