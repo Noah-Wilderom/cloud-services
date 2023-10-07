@@ -114,6 +114,8 @@ func Git(project *projects.Project) error {
 	_ = cmd.Run()
 	cmd = exec.Command("chown", "-R", "www-data:www-data", dir)
 	_ = cmd.Run()
+	cmd = exec.Command("git", "config", "--global", "--add", "safe.directory", dir)
+	_ = cmd.Run()
 
 	image := helpers.NavigateAndTakeScreenshot(fmt.Sprintf("http://%s", fullDomain))
 	err = conn.UpdateScreenshot(project.GetId(), image)
